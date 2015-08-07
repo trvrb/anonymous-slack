@@ -84,7 +84,7 @@ func sendAnonymousMessage(message string) error {
 	url := os.Getenv(webhookConfig)
 	payload, err := json.Marshal(slackMsg{
 		Text:     message,
-		Channel:  "random",
+		Channel:  "#random",
 		Username: fmt.Sprintf("an anonymous %s", animals[rand.Intn(len(animals))]),
 	})
 	if err != nil {
