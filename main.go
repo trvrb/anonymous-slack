@@ -47,7 +47,7 @@ var (
 		"rhino", "sheep", "shrew", "skunk", "slow loris", "squirrel", "turtle", "walrus", "wolf", "wolverine", "wombat",
 	}
 	// Username must be first.
-	payloadExp = regexp.MustCompile(`([@#][^\s]+):?(.*)`)
+	payloadExp = regexp.MustCompile(`(.*)`)
 )
 
 // readAnonymousMessage parses the username and re-routes
@@ -70,22 +70,21 @@ func readAnonymousMessage(r *http.Request) string {
 	if matches == nil {
 		return "Failed; message should be like: /anon @ashwin hey what's up?"
 	}
-	user := matches[1]
-	msg = strings.TrimSpace(matches[2])
-	err = sendAnonymousMessage(user, msg)
+	msg = strings.TrimSpace(matches[1])
+	err = sendAnonymousMessage(msg)
 	if err != nil {
 		return "Failed to send message."
 	}
-	return fmt.Sprintf("Anonymously sent [%s] to %s", msg, user)
+	return fmt.Sprintf("Anonymously sent [%s] to #random", msg)
 }
 
-// sendAnonymousMessage uses an incoming hook to Direct Message
+// sendAnonymousMessage uses an incoming hook to random
 // the given user the message, from a random animal.
-func sendAnonymousMessage(username, message string) error {
+func sendAnonymousMessage(message string) error {
 	url := os.Getenv(webhookConfig)
 	payload, err := json.Marshal(slackMsg{
 		Text:     message,
-		Channel:  username,
+		Channel:  random,
 		Username: fmt.Sprintf("an anonymous %s", animals[rand.Intn(len(animals))]),
 	})
 	if err != nil {
